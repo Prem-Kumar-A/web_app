@@ -65,8 +65,8 @@ class _LoginPageState extends State<LoginPage> {
             child: Padding(
               padding: const EdgeInsets.all(40),
               child: Container(
-                constraints: BoxConstraints(maxHeight: 700,  maxWidth: 600),
-                
+                constraints: BoxConstraints(maxHeight: 700, maxWidth: 600),
+
                 foregroundDecoration: BoxDecoration(
                   border: Border.all(
                     color: Theme.of(context).colorScheme.inverseSurface,
@@ -115,14 +115,14 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                         child: passwordTextBox(),
                       ),
-                      Padding(
-                        padding: const EdgeInsets.only(
-                          left: 100,
-                          right: 100,
-                          bottom: 20,
-                        ),
-                        child: unitSelection(),
-                      ),
+                      // Padding(
+                      //   padding: const EdgeInsets.only(
+                      //     left: 100,
+                      //     right: 100,
+                      //     bottom: 20,
+                      //   ),
+                      //   child: unitSelection(),
+                      // ),
                       Padding(
                         padding: const EdgeInsets.only(
                           left: 100,
@@ -130,6 +130,14 @@ class _LoginPageState extends State<LoginPage> {
                           bottom: 20,
                         ),
                         child: plantSelection(),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(
+                          left: 100,
+                          right: 100,
+                          bottom: 20,
+                        ),
+                        child: AutoCompleteSearch(),
                       ),
                       Padding(
                         padding: const EdgeInsets.only(bottom: 20),
@@ -163,7 +171,7 @@ class _LoginPageState extends State<LoginPage> {
         labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),
         hintText: "Enter your User Name",
         hintStyle: TextStyle(color: Colors.grey),
-        prefixIcon: Icon(Icons.person),
+        prefixIcon: Icon(Icons.person_rounded, size: 20),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
       ),
     );
@@ -179,7 +187,7 @@ class _LoginPageState extends State<LoginPage> {
         labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),
         hintText: "Enter your password",
         hintStyle: TextStyle(color: Colors.grey),
-        prefixIcon: Icon(Icons.lock),
+        prefixIcon: Icon(Icons.lock_rounded, size: 20),
         suffixIcon: showIcon
             ? IconButton(
                 icon: Icon(
@@ -195,43 +203,6 @@ class _LoginPageState extends State<LoginPage> {
             : null,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
       ),
-    );
-  }
-
-  Widget unitSelection() {
-    return DropdownButtonFormField<String>(
-      focusNode: plantFocus,
-      initialValue: selectedPlant,
-      menuMaxHeight: 200,
-      dropdownColor: Theme.of(context).colorScheme.primary,
-      borderRadius: BorderRadius.circular(25),
-      decoration: InputDecoration(
-        labelText: "Unit",
-        hintText: showList? '--Select--':null ,
-        prefixIcon: const Icon(Icons.factory),
-        border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
-      ),
-      items: plant.map((plant) {
-        return DropdownMenuItem(
-          value: plant,
-          child: Text(
-            plant,
-            selectionColor: Theme.of(context).colorScheme.primary,
-          ),
-        );
-      }).toList(),
-      onChanged: (value) {
-        setState(() {
-          selectedPlant = value;
-        });
-      },
-
-      validator: (value) {
-        if (value == null) {
-          return "Please select Plant";
-        }
-        return null;
-      },
     );
   }
 
@@ -295,34 +266,73 @@ class _LoginPageState extends State<LoginPage> {
 
   Widget plantSelection() {
     return TextFormField(
+      autofillHints: plant,
       controller: plantSelectController,
+      initialValue: selectedPlant,
       decoration: InputDecoration(
-        labelText: "Plant",
-        labelStyle: TextStyle(color: Theme.of(context).colorScheme.secondary),
-        hintText: "--Select--",
-        hintStyle: TextStyle(color: Colors.grey),
-        prefixIcon: Icon(Icons.factory),
-        suffixIcon: DropdownButtonHideUnderline(
-          child: DropdownButton(
-            items: plant.map((plant) {
-              return DropdownMenuItem(
-                enabled: showList,
-                value: plant,
-                child: Text(
-                  plant,
-                  selectionColor: Theme.of(context).colorScheme.primary,
-                ),
-              );
-            }).toList(),
-            onChanged: (value) {
-              setState(() {
-                selectedPlant = value;
-              });
-            },
-          ),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
+        labelText: 'Plant',
+        prefixIcon: Icon(Icons.factory_rounded, size: 20),
+        suffixIcon: IconButton(
+          onPressed: () {},
+          icon: Icon(Icons.arrow_drop_down),
+        ),
+      ),
+    );
+  }
+
+  Widget unitSelection() {
+    return DropdownButtonFormField<String>(
+      initialValue: selectedPlant,
+      menuMaxHeight: 200,
+      style: TextStyle(color: Theme.of(context).colorScheme.inverseSurface),
+      borderRadius: BorderRadius.circular(25),
+      decoration: InputDecoration(
+        labelText: "Unit",
+        enabled: true,
+        // hint Text: showList? '--Select--':null ,
+        prefixIcon: const Icon(Icons.factory),
+        suffixIcon: IconButton(
+          icon: Icon(Icons.arrow_drop_down),
+          onPressed: () {},
         ),
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(25)),
       ),
+
+      items: plant.map((plant) {
+        return DropdownMenuItem(
+          value: plant,
+          child: Text(
+            plant,
+            style: TextStyle(
+              color: Theme.of(context).colorScheme.inverseSurface,
+            ),
+          ),
+        );
+      }).toList(),
+      onChanged: (value) {
+        setState(() {
+          selectedPlant = value;
+        });
+      },
+
+      validator: (value) {
+        if (value == null) {
+          return "Please select Plant";
+        }
+        return null;
+      },
+    );
+  }
+
+  Widget AutoCompleteSearch() {
+    return Autocomplete<String>(
+      optionsBuilder: (TextEditingValue textEditingValue) {
+        return plant.where(
+          (item) =>
+              item.toLowerCase().contains(textEditingValue.text.toLowerCase()),
+        );
+      },
     );
   }
 }
